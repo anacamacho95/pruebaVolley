@@ -10,6 +10,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import org.json.JSONException
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
@@ -17,8 +18,7 @@ class MainActivity : AppCompatActivity() {
     // URL de la API para obtener posts
     //val url = "https://jsonplaceholder.typicode.com/posts"
 
-    val url ="https://firestore.googleapis.com/v1/projects/alimentosbd-7be67/databases/(default)/documents/alimentos"
-
+    val url ="https://rickandmortyapi.com/api/character/"
     // Crear una cola de solicitudes
     lateinit var cola:RequestQueue
 
@@ -30,22 +30,45 @@ class MainActivity : AppCompatActivity() {
         //probarGet() //de un web service público
 
         // Probar acceso a FB como api rest
+        pruebaGetPersonajes()
+        /*
         pruebaPostAlimento("nuevo alimento",120.0)
         pruebaGetAlimentos()
         pruebaGetUnAlimento()
         pruebaDeleteAlimento()
         pruebaActualizaUnAlimento()
-
+*/
     }
 
+    fun pruebaGetPersonajes() {
+        val solicitud = JsonObjectRequest(Request.Method.GET, url, null,
+            Response.Listener { response ->
+                try {
+                    val results = response.getJSONArray("results")
+                    for (i in 0 until results.length()) {
+                        val personajeJson = results.getJSONObject(i)
+                        val nombre = personajeJson.getString("name")
+                        Log.d("Perzonaje", nombre)
+
+                    }
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+
+                }
+            },
+            Response.ErrorListener { error ->
+                error.printStackTrace()
+
+            })
+        cola.add(solicitud)
+
+    }
     private fun pruebaGetUnAlimento() {
-
-        val url = "https://firestore.googleapis.com/v1/projects/alimentosbd-7be67/databases/(default)/documents/alimentos/Ah84prKpWyNsQfLZ0qas"
-
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
-                Log.d("Firestore", "Documento obtenido: $response")
+
             },
             Response.ErrorListener { error ->
                 Log.e("Firestore", "Error: $error")
